@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado Completo: Saúde da Família</title>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+    .container { width: 100%; max-width: 850px; background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column; }
+    
+    h1 { text-align: center; color: #2c3e50; margin: 0 0 5px 0; font-size: 2rem; }
+    .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 35px; font-size: 1rem; font-weight: 400; }
+    
+    /* Barra de Progresso */
+    .progress-container { margin-bottom: 35px; }
+    .progress-info { display: flex; justify-content: space-between; font-size: 0.85em; color: #95a5a6; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .progress-bg { height: 6px; background: #edf2f7; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #3498db, #2ecc71); width: 0%; transition: width 0.4s ease; }
+
+    /* Área da Questão */
+    .question-box { display: none; animation: fadeIn 0.4s ease; }
+    .question-box.active { display: block; }
+    
+    h3 { color: #2c3e50; font-size: 1.3rem; margin-bottom: 15px; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; }
+    .enunciado { font-size: 1.05rem; line-height: 1.65; margin-bottom: 25px; color: #34495e; }
+    
+    /* Opções (Múltipla Escolha) */
+    .options label { display: flex; align-items: flex-start; margin: 12px 0; cursor: pointer; padding: 15px; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 10px; transition: all 0.2s ease; }
+    .options label:hover { border-color: #cbd5e0; background: #f8fafc; }
+    .options input[type="radio"] { margin-right: 15px; margin-top: 4px; accent-color: #3498db; transform: scale(1.1); }
+    .options label.selected { border-color: #3498db; background-color: #ebf8ff; }
+    .options label.correct-option { border-color: #27ae60; background-color: #e8f8f5; }
+    .options label.wrong-option { border-color: #e74c3c; background-color: #fdeaea; }
+
+    /* Área de Texto (Discursiva) */
+    textarea { width: 100%; height: 100px; padding: 15px; border: 1.5px solid #cbd5e0; border-radius: 10px; font-family: inherit; font-size: 1rem; resize: vertical; margin-top: 10px; transition: border 0.3s; box-sizing: border-box; }
+    textarea:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
+
+    /* Botões */
+    .btn-action { background-color: #3498db; color: white; border: none; padding: 14px 28px; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 25px; width: 100%; transition: all 0.2s; }
+    .btn-action:hover { background-color: #2980b9; transform: translateY(-1px); }
+    .btn-action:active { transform: translateY(0); }
+    
+    .nav-buttons { display: flex; gap: 12px; margin-top: 20px; }
+    .btn-nav { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; color: white; transition: opacity 0.2s; }
+    .btn-prev { background-color: #95a5a6; }
+    .btn-next { background-color: #27ae60; }
+    .btn-nav:hover { opacity: 0.9; }
+
+    /* Feedback */
+    .feedback { margin-top: 30px; padding: 25px; border-radius: 12px; display: none; }
+    .feedback.show { display: block; animation: slideUp 0.4s ease; }
+    .feedback.correct-style { background-color: #f0fff4; border: 1px solid #c6f6d5; color: #22543d; }
+    .feedback.info-style { background-color: #f7fafc; border: 1px solid #e2e8f0; color: #2d3748; }
+    .feedback.wrong-style { background-color: #fff5f5; border: 1px solid #fed7d7; color: #742a2a; }
+
+    .feedback-header { font-weight: 800; margin-bottom: 15px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+    .gabarito-box { background: rgba(255,255,255,0.6); padding: 12px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; }
+    
+    .explanation-block { margin-top: 15px; }
+    .tag { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75em; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+    .tag-succinct { background: #e67e22; color: white; }
+    .tag-theory { background: #8e44ad; color: white; }
+    .explanation-text { font-size: 0.95rem; line-height: 1.6; margin: 0; }
+
+    /* Rodapé (Footer) */
+    .footer { text-align: center; margin-top: auto; padding-top: 40px; border-top: 1px solid #eee; color: #bdc3c7; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.5px; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Simulado: Saúde da Família</h1>
+    <div class="subtitle">Revisão Completa | 83 Questões</div>
+    
+    <div class="progress-container">
+        <div class="progress-info">
+            <span>Progresso</span>
+            <span id="progress-text">1 / 83</span>
+        </div>
+        <div class="progress-bg"><div class="progress-fill" id="progress"></div></div>
+    </div>
+
+    <div id="quiz-container"></div>
+
+    <div class="footer">
+        Feito por Rafael Harduim
+    </div>
+</div>
+
+<script>
+    const questionsPart1 = [
+        {
+            id: 1,
+            type: 'discursive',
+            title: 'Caso Vitória - Exames',
+            enunciado: '<strong>Questão 1:</strong> Vitória, 22 anos, nulípara, veio hoje em consulta de demanda livre para iniciar pré-natal. Namora Pedro há 3 anos e não estava usando preservativo nas relações sexuais, trabalha como caixa em um grande supermercado. Reside com sua mãe e 2 irmãos mais novos, mas já estava com planos de morar com o namorado. Gravidez bem aceita. nega tabagismo. Diagnóstico Lúpus Eritematoso Sistêmico na infância, em bom controle, realizou exames recentemente. Ao exame físico: pressão arterial 120x70mmg, FC 75bpm, Peso 95kg, Altura 1,65M, IMC 35.<br><br><strong>A) Quais os exames laboratoriais devemos solicitar na primeira consulta de pré-natal?</strong>',
+            correctAnswer: 'Hemograma, Tipagem/Rh, Coombs Indireto (se Rh-), Glicemia, Testes Rápidos (Sífilis, HIV, Hepatites), Toxoplasmose, Rubéola, EAS/Urocultura + <strong>Função Renal (Ureia/Creatinina) e Proteinúria de 24h</strong>.',
+            succinct: 'Gestante de alto risco (Lúpus + Obesidade). Exige rotina padrão + monitoramento de função renal.',
+            detailed: 'O Lúpus exige vigilância estrita de atividade da doença, principalmente nefrite lúpica, por isso a creatinina basal e a pesquisa de proteinúria são essenciais desde o início. Além disso, o IMC 35 classifica como obesidade grau II, exigindo vigilância para Diabetes Gestacional e Hipertensão.'
+        },
+        {
+            id: 2,
+            type: 'discursive',
+            title: 'Caso Vitória - Suplementação',
+            enunciado: '(Continuação do caso Vitória).<br><br><strong>B) Quais suplementações devemos prescrever para Vitória para uso durante a sua gestação?</strong>',
+            correctAnswer: 'Ácido Fólico, Sulfato Ferroso e <strong>Cálcio (1,0 a 2,0g/dia)</strong>.',
+            succinct: 'Cálcio é mandatório para prevenção de pré-eclâmpsia em pacientes com fatores de risco.',
+            detailed: 'Segundo a OMS e o Ministério da Saúde, a suplementação de cálcio reduz o risco de pré-eclâmpsia em mulheres com baixa ingestão dietética ou alto risco (obesidade, doenças autoimunes, hipertensão crônica). O mecanismo envolve a redução da secreção de paratormônio (PTH) e do cálcio intracelular, diminuindo a reatividade vascular.'
+        },
+        {
+            id: 3,
+            type: 'discursive',
+            title: 'Caso Vitória - Pós-Parto',
+            enunciado: '(Continuação do caso Vitória).<br><br><strong>C) Pensando no seguimento pós parto, cite cinco exames de rastreamento que devemos solicitar/realizar no recém nascido?</strong>',
+            correctAnswer: 'Teste do Pezinho, Teste da Orelhinha, Teste do Olhinho, Teste do Coraçãozinho e Teste da Linguinha.',
+            succinct: 'São os 5 testes de triagem neonatal preconizados pelo Ministério da Saúde.',
+            detailed: '<strong>Pezinho:</strong> Doenças metabólicas/genéticas.<br><strong>Coraçãozinho (24-48h):</strong> Cardiopatias críticas.<br><strong>Olhinho:</strong> Catarata/Retinoblastoma.<br><strong>Orelhinha:</strong> Surdez.<br><strong>Linguinha:</strong> Anquiloglossia.'
+        },
+        {
+            id: 4,
+            type: 'discursive',
+            title: 'Outubro Rosa - Rastreio e Conduta',
+            enunciado: '<strong>Questão 4:</strong> O outubro rosa é um movimento internacional de conscientização para o controle do câncer de mama...<br><br><strong>A) Durante a avaliação dos resultados dos exames realizados na campanha, você recebe um exame de uma mulher de 30 anos, com o seguinte resultado: lesão de baixo grau (LSIL). Qual o seguimento?</strong><br><strong>B) Maria, 60 anos, realizou a mamografia solicitada na campanha e apresentou resultado BIRADS 3, qual melhor conduta a ser seguida?</strong><br><strong>C) Segundo o Ministério da saúde, qual a faixa etária para rastreamento de câncer de mama?</strong>',
+            correctAnswer: 'A) Repetir Preventivo em 6 meses. B) Repetir Mamografia em 6 meses. C) 50 a 69 anos (bienal).',
+            succinct: 'LSIL >= 25 anos repete em 6m. BIRADS 3 é controle semestral. Rastreio mama 50-69.',
+            detailed: '<strong>LSIL:</strong> Alta taxa de regressão espontânea. Diretriz recomenda repetir em 6 meses (>= 25 anos).<br><strong>BIRADS 3:</strong> Risco de malignidade <= 2%. Conduta é controle radiológico semestral por 2-3 anos.'
+        },
+        {
+            id: 5,
+            type: 'discursive',
+            title: 'Caso Joana - Preventivo',
+            enunciado: '<strong>Questão 5:</strong> Joana, 50 anos, sem comorbidades, compareceu em consulta agendada para coleta de preventivo e solicitação de mamografia, conforme rastreio recomendado para sua idade. Relatou presença de corrimento branco grumoso, sem odor e acompanhado de prurido há 1 semana, negou dispareunia. Sem outras queixas no momento.<br><br><strong>A) Joana retorna com resultado de preventivo apresentando atipias de significado indeterminado em células escamosas, provavelmente não neoplásicas (ASC-US) e mamografia com BIRADS 0 em direita e 1 em mama esquerda. Como deve ser orientado o acompanhamento e seguimento diante dos resultados apresentados?</strong>',
+            correctAnswer: 'Preventivo: Repetir em 6 meses. Mamografia: Solicitar Ultrassonografia Mamária.',
+            succinct: 'ASC-US >= 30 anos repete semestralmente. BIRADS 0 exige exame complementar.',
+            detailed: '<strong>ASC-US:</strong> Em mulheres >= 30 anos, repete-se em 6 meses. Se vier normal, repete mais uma vez em 6 meses. Se vier alterado novamente, colposcopia.<br><strong>BIRADS 0:</strong> Inconclusivo. Necessita de incidências adicionais ou ultrassonografia.'
+        },
+        {
+            id: 6,
+            type: 'discursive',
+            title: 'Caso Joana - Diagnóstico',
+            enunciado: '(Continuação do caso Joana).<br><br><strong>B) Qual o provável diagnóstico de Joana? Descreva o tratamento proposto.</strong>',
+            correctAnswer: 'Candidíase Vulvovaginal. Tratamento: Fluconazol 150mg VO dose única ou Miconazol creme vaginal por 7 dias.',
+            succinct: 'Sintomas clássicos de infecção fúngica.',
+            detailed: 'O corrimento branco, grumoso (aspecto de ricota), aderente e pruriginoso é patognomônico. O tratamento visa erradicar o supercrescimento de Candida sp com antifúngicos azólicos.'
+        },
+        {
+            id: 7,
+            type: 'multiple',
+            title: 'Questão Pré-Natal Múltipla Escolha',
+            enunciado: '<strong>Questão 6:</strong> Paciente, 35 anos, vem em consulta com queixa de atraso menstrual há 1 semana... Sífilis tratada na última gestação... Assinale a alternativa correta:',
+            options: [
+                'A) Paciente deverá realizar na primeira consulta TR de HIV, Hepatite C e Hepatite B e sífilis',
+                'B) Caso VDRL > 1/8, deverá ser realizado novo tratamento para sífilis com dose única de Penicilina benzatina',
+                'C) A partir de 20 semanas será recomendada a vacinação dTpa, realizada em toda gestação independente do histórico vacinal',
+                'D) Caso apresente fator RH negativo no primeiro exame, será solicitado COOMBS direto para avaliação complementar'
+            ],
+            correctAnswer: 2, // C
+            succinct: 'dTpa é obrigatória em cada gestação para proteção do RN.',
+            detailed: '<strong>C (Correta):</strong> A vacina dTpa induz a produção de anticorpos que passam pela placenta. <strong>A (Incorreta):</strong> Sífilis prévia exige VDRL, pois TR é cicatriz. <strong>B (Incorreta):</strong> Reinfecção exige 3 doses. <strong>D (Incorreta):</strong> Mãe faz Coombs Indireto.'
+        },
+        {
+            id: 8,
+            type: 'discursive',
+            title: 'Rastreio de Estreptococo',
+            enunciado: 'Gestante no 3º trimestre.<br><br><strong>A) Qual exame deve ser coletado universalmente entre 35-37 semanas de gestação para prevenção de sepse neonatal?</strong><br><strong>B) Como é feita a coleta desse exame?</strong><br><strong>C) Se o resultado for POSITIVO, qual a conduta no momento do trabalho de parto?</strong><br><strong>D) Se a paciente chegar em trabalho de parto sem o resultado desse exame, quais são os fatores de risco que indicariam a profilaxia?</strong>',
+            correctAnswer: 'A) Cultura para Estreptococo do Grupo B (EGB/GBS). B) Swab Vagino-Retal. C) Penicilina Cristalina venosa intraparto. D) Prematuridade (<37sem), Febre intraparto (>= 38°C), Bolsa rota > 18h.',
+            succinct: 'Rastreio universal para prevenir sepse precoce.',
+            detailed: 'A colonização por GBS é o principal fator de risco para sepse neonatal precoce. A cultura vagino-retal é padrão-ouro. A profilaxia antibiótica intraparto reduz drasticamente a transmissão vertical.'
+        },
+        {
+            id: 9,
+            type: 'discursive',
+            title: 'Caso Gustavo - Diagnóstico',
+            enunciado: '<strong>Questão 2:</strong> Gustavo, 19 anos, vem em atendimento pedindo para realizar testes rápidos. Relata relação sexual desprotegida há 15 dias e há 3 dias notou aparecimento de úlcera avermelhada, indolor, com bordas endurecidas e fundo limpo em região de glande. Nega historia prévia de IST.<br><br><strong>A) Qual a principal hipótese diagnóstica?</strong>',
+            correctAnswer: 'Sífilis Primária (Cancro Duro).',
+            succinct: 'Úlcera genital única, indolor e limpa.',
+            detailed: 'O tempo de incubação e as características da lesão (dura, indolor, limpa) fecham o diagnóstico clínico presuntivo de infecção por Treponema pallidum.'
+        },
+        {
+            id: 10,
+            type: 'discursive',
+            title: 'Caso Gustavo - Tratamento',
+            enunciado: '(Continuação do caso Gustavo).<br><br><strong>B) Qual o tratamento medicamentoso e qual o seguimento indicado para o quadro?</strong>',
+            correctAnswer: 'Penicilina G Benzatina 2.400.000 UI IM (dose única). Seguimento com VDRL trimestral.',
+            succinct: 'Sífilis primária trata-se com dose única. Cura = queda de títulos.',
+            detailed: 'Para Sífilis Primária, a dose única é suficiente. O seguimento com VDRL é obrigatório para confirmar cura (queda de 4x nos títulos) e descartar falha ou reinfecção.'
+        },
+        {
+            id: 11,
+            type: 'discursive',
+            title: 'Caso Gustavo - Parceiro',
+            enunciado: '(Continuação do caso Gustavo).<br><br><strong>C) A pessoa que teve relação com Gustavo não apresenta sintomas, qual melhor conduta diante da suspeita diagnóstica?</strong>',
+            correctAnswer: 'Tratamento imediato (empírico) com a mesma dose + Testes + Aconselhamento.',
+            succinct: 'Contatos sexuais recentes (< 90 dias) devem ser tratados mesmo sem sintomas.',
+            detailed: 'O PCDT de IST recomenda tratamento epidemiológico para parcerias sexuais de até 90 dias devido à possibilidade de estarem em período de incubação (janela imunológica).'
+        },
+        {
+            id: 12,
+            type: 'multiple',
+            title: 'Questão Úlcera Jorge',
+            enunciado: '<strong>Questão 8:</strong> Jorge, 20 anos, observou surgimento de lesão dolorosa em região genital há 1 semana. Ao exame, seu médico identificou a presença de úlcera não endurecida, com base coberta por exsudato e linfadenopatia inguinal dolorosa unilateral. <strong>Qual diagnóstico mais provável de Jorge?</strong>',
+            options: [
+                'A) Sífilis Primária',
+                'B) Linfogranuloma venéreo',
+                'C) Cancro mole',
+                'D) Donovanose',
+                'E) Herpes genital'
+            ],
+            correctAnswer: 2, // C
+            succinct: 'Dor + fundo sujo (pus) + bubão = Cancro Mole.',
+            detailed: '<strong>Cancro Mole (Haemophilus ducreyi):</strong> Úlceras múltiplas, dolorosas, fundo necrótico e bordas irregulares. Adenopatia dolorosa que fistuliza por orifício único.'
+        },
+        {
+            id: 13,
+            type: 'discursive',
+            title: 'Caso Carlos - Uretrite',
+            enunciado: 'Carlos, 22 anos, vem à UBS com queixa de ardência ao urinar (disúria) e saída de secreção purulenta (amarelada) pelo pênis há 2 dias. Relata relação sexual desprotegida há 1 semana.<br><br><strong>A) Na abordagem sindrômica, quais são os dois agentes etiológicos que devemos tratar empiricamente de imediato?</strong><br><strong>B) Qual o esquema antibiótico recomendado?</strong><br><strong>C) Notificação?</strong>',
+            correctAnswer: 'A) Gonococo e Clamídia. B) Ceftriaxona 500mg IM + Azitromicina 1g VO. C) Semanal.',
+            succinct: 'Tratamento sindrômico cobre os dois agentes principais.',
+            detailed: 'Trata-se gonorreia (purulenta) e clamídia (mucoide) conjuntamente devido à alta taxa de coinfecção. A notificação é semanal (Síndrome do Corrimento Uretral).'
+        },
+        {
+            id: 14,
+            type: 'multiple',
+            title: 'PEP HIV',
+            enunciado: '<strong>Questão 6:</strong> Funcionária da limpeza de um hospital... acidenta-se com agulha que se encontrava de permeio... A profilaxia pós-exposição de HIV nesta paciente:',
+            options: [
+                'A) Deve ser iniciada imediatamente e mantida por um mês.',
+                'B) Deve ser considerada após resultado de sorologia negativa.',
+                'C) Deve ser iniciada imediatamente e reavaliada após resultado de sorologia.',
+                'D) Não é recomendada.'
+            ],
+            correctAnswer: 0, // A
+            succinct: 'PEP é urgência médica. Início ideal nas primeiras 2h.',
+            detailed: 'A PEP HIV com antirretrovirais deve ser iniciada preferencialmente nas primeiras 2 horas e no máximo até 72 horas. O tempo de duração é 28 dias.'
+        },
+        {
+            id: 15,
+            type: 'discursive',
+            title: 'Caso Roberto - Tratamento HAS',
+            enunciado: '<strong>Questão 3:</strong> Roberto, 55 anos e taxista... Tabagista desde 30 anos... Diabetes... PA 165 x 100...<br><br><strong>A) Cite um esquema terapêutico inicial para controle pressórico de Roberto.</strong>',
+            correctAnswer: 'Terapia Combinada: IECA ou BRA (obrigatório) + Diurético Tiazídico ou BCC.',
+            succinct: 'Estágio 2 exige 2 drogas. Diabetes exige nefroproteção.',
+            detailed: 'A PA >= 160/100 classifica como HAS Estágio 2, indicando início com 2 fármacos. A presença de Diabetes torna obrigatório o uso de bloqueadores do sistema renina-angiotensina (Enalapril, Losartana) devido ao efeito nefroprotetor.'
+        },
+        {
+            id: 16,
+            type: 'discursive',
+            title: 'Caso Roberto - Oftalmo',
+            enunciado: '(Continuação do caso Roberto).<br><br><strong>B) Com qual frequência ele deverá ser encaminhado para avaliação de lesão de órgão alvo com o oftalmologista?</strong>',
+            correctAnswer: 'Anualmente.',
+            succinct: 'DM2 exige rastreio de retinopatia ao diagnóstico e depois anualmente.',
+            detailed: 'Diretrizes da SBD e ADA recomendam fundo de olho no diagnóstico do DM2 e anualmente depois. A retinopatia diabética pode ser assintomática no início.'
+        },
+        {
+            id: 17,
+            type: 'discursive',
+            title: 'Caso Roberto - Carga Tabágica',
+            enunciado: '(Continuação do caso Roberto).<br><br><strong>C) Qual carga tabágica do Paciente? Cite 2 recursos presentes nas unidades básicas de saúde para tratamento do tabagismo?</strong>',
+            correctAnswer: '30 anos-maço. Recursos: Grupos de apoio e Medicamentos (Adesivos/Bupropiona).',
+            succinct: 'Cálculo: 1 maço x 30 anos = 30.',
+            detailed: 'O cálculo da carga tabágica é (Nº cigarros dia / 20) x Anos fumando. O tratamento na APS combina abordagem comportamental e farmacológica.'
+        },
+        {
+            id: 18,
+            type: 'discursive',
+            title: 'Caso Sr. Jorge - Carga Tabágica',
+            enunciado: '<strong>Questão 2:</strong> Sr. Jorge... 60 anos... tabagista de um maço por dia desde os 20 anos...<br><br><strong>A) Calcule a carga tabágica do paciente citado e cite 2 ferramentas terapêuticas para cessação do tabagismo disponibilizadas na APS?</strong>',
+            correctAnswer: '40 anos-maço.',
+            succinct: '60 anos (idade) - 20 anos (início) = 40 anos de fumo. 40 x 1 = 40.',
+            detailed: 'Cálculo de risco cumulativo de exposição ao tabaco.'
+        },
+        {
+            id: 19,
+            type: 'discursive',
+            title: 'Caso Sr. Jorge - Exames',
+            enunciado: '(Continuação do caso Sr. Jorge).<br><br><strong>B) Após ajuste da medicação para controle da diabetes, em quanto tempo deve ser solicitado um novo valor de HBA1C? Qual exame solicitar para rastreio de retinopatia diabética?</strong>',
+            correctAnswer: '3 meses. Fundoscopia.',
+            succinct: 'HbA1c reflete os últimos 3 meses.',
+            detailed: 'A hemoglobina glicada reflete a média glicêmica dos últimos 120 dias (vida da hemácia). Repetir antes de 3 meses não mostra o efeito total da mudança terapêutica.'
+        },
+        {
+            id: 20,
+            type: 'discursive',
+            title: 'Caso Carlos - HAS',
+            enunciado: '<strong>Questão 3:</strong> Carlos, 70 anos... PA 165/100 mmHg...<br><br><strong>A) Qual o estágio da Hipertensão de Carlos? Como podemos ajustar sua medicação?</strong>',
+            correctAnswer: 'Estágio 2. Adicionar 2ª droga (Diurético ou BCC).',
+            succinct: '>= 160/100 é Estágio 2. Terapia combinada necessária.',
+            detailed: 'PA sistólica >= 160 define Estágio 2. Como ele já usa IECA (Enalapril), a diretriz recomenda associar um Diurético Tiazídico (HCTZ) ou Bloqueador de Canal de Cálcio para potencializar o efeito.'
+        }
+    ];
+    const questionsPart2 = [
+        {
+            id: 21,
+            type: 'discursive',
+            title: 'Caso Carlos - Acompanhamento',
+            enunciado: '(Continuação do caso Carlos).<br><br><strong>B) Cite 5 exames que devem ser solicitados para o acompanhamento do paciente</strong>',
+            correctAnswer: 'Creatinina, Potássio, Glicemia de jejum, Perfil Lipídico e ECG (ou EAS).',
+            succinct: 'Rastreio de lesão de órgão alvo e fatores de risco.',
+            detailed: 'Monitorar função renal, eletrólitos (pelo uso de diuréticos/IECA) e risco cardiovascular global.'
+        },
+        {
+            id: 22,
+            type: 'multiple',
+            title: 'Questão Insulinas',
+            enunciado: '<strong>Questão 10:</strong> As insulinas disponíveis no SUS para o tratamento dos pacientes com diabetes apresentam diferentes características entre elas, assinale a alternativa correta quanto as suas especificações.',
+            options: [
+                'A) A Insulina regular é de ação rápida e tem seu início em 15 minutos, atingindo seu pico de ação em 1 hora.',
+                'B) A insulina NPH tem ação intermediaria com pico entre 3 horas com duração até 18 horas sendo sua dose recomendada imediatamente após a janta às 19:00 horas.',
+                'C) A insulina NPH tem ação intermediária, com início entre 2 e 4 horas, sendo recomendada a dose noturna às 22 horas.',
+                'D) A insulina aspart é de ação rápida e deve ser indicada antes do café da manhã, já que seu início de ação é de 90 minutos.'
+            ],
+            correctAnswer: 2, // C
+            succinct: 'NPH é basal noturna (bedtime).',
+            detailed: 'A Insulina NPH tem início de ação em 2-4h, pico em 4-10h e duração de 12-18h. A aplicação "bedtime" visa cobrir o jejum noturno com pico na madrugada.'
+        },
+        {
+            id: 23,
+            type: 'discursive',
+            title: 'Caso Pedro - ICC',
+            enunciado: '<strong>Questão 9:</strong> Pedro, 67 anos... queixa de fadiga ao andar o quarteirão e edema bilateral em membros inferiores... diagnosticou com insuficiência cardíaca congestiva e iniciou seu acompanhamento.<br><br><strong>A) Qual o NYHA do paciente baseado na história relatada por Pedro?</strong>',
+            correctAnswer: 'NYHA Classe II.',
+            succinct: 'Sintomas a esforços habituais (andar quarteirão).',
+            detailed: 'Classificação NYHA: Classe I (assintomático), Classe II (sintomas leves em atividades habituais), Classe III (sintomas em atividades menores que habituais), Classe IV (sintomas em repouso).'
+        },
+        {
+            id: 24,
+            type: 'discursive',
+            title: 'Caso Pedro - Sinais Físicos',
+            enunciado: '(Continuação do caso Pedro).<br><br><strong>B) Questão 10: Além dos sintomas apresentados por Pedro (fadiga e edema de membros inferiores), cite 3 outros sinais no exame físico que podem ser observados em pacientes com ICC?</strong>',
+            correctAnswer: 'Turgência Jugular Patológica, Estertores Pulmonares, B3 (terceira bulha).',
+            succinct: 'Sinais clássicos de congestão e disfunção ventricular.',
+            detailed: 'Turgência Jugular indica aumento da pressão atrial direita. Estertores indicam congestão pulmonar. B3 indica sobrecarga de volume.'
+        },
+        {
+            id: 25,
+            type: 'discursive',
+            title: 'Caso Pedro - Exames Imagem',
+            enunciado: '(Continuação do caso Pedro).<br><br><strong>C) Questão 11: Cite duas alterações que podem ser encontradas no RX de tórax e outras duas no ECG de pacientes com quadro de ICC.</strong>',
+            correctAnswer: 'RX: Cardiomegalia, Congestão Pulmonar. ECG: HVE, Fibrilação Atrial.',
+            succinct: 'RX vê anatomia/congestão. ECG vê repercussão elétrica.',
+            detailed: 'Cardiomegalia no RX (ICT > 0,5). No ECG, Hipertrofia Ventricular Esquerda (HVE) e Bloqueio de Ramo Esquerdo são comuns.'
+        },
+        {
+            id: 26,
+            type: 'discursive',
+            title: 'Caso HAS Cláudio',
+            enunciado: 'Cláudio, 58 anos, tabagista, obeso. PA 152 x 94 mmHg.<br><br><strong>A) Qual é o estágio da Hipertensão de Sr. Cláudio?<br>B) A recomendação atual é Monoterapia ou Terapia Combinada?</strong>',
+            correctAnswer: 'A) Estágio 1. B) Terapia Combinada.',
+            succinct: 'Risco cardiovascular alto indica início agressivo.',
+            detailed: 'Pacientes de estágio 1 (140-159/90-99) com múltiplos fatores de risco beneficiam-se de início com 2 drogas em dose baixa.'
+        },
+        {
+            id: 27,
+            type: 'discursive',
+            title: 'Questão Insulina Pico',
+            enunciado: 'Para um paciente que usa Insulina NPH à noite (bedtime) às 22h, em qual horário é esperado o pico de ação máximo (risco de hipoglicemia) dessa insulina?',
+            correctAnswer: 'Madrugada (entre 02h e 08h da manhã).',
+            succinct: 'Pico ocorre 4 a 10h após injeção.',
+            detailed: 'Horário crítico para monitorar hipoglicemia noturna assintomática.'
+        },
+        {
+            id: 28,
+            type: 'discursive',
+            title: 'Caso Luciana - Tratamento TB',
+            enunciado: '<strong>Questão 5:</strong> Luciana, 24 anos... tosse produtiva há 30 dias... TRM positivo...<br><br><strong>A) Qual o medicamento indicado segundo o Ministério da Saúde e o tempo de tratamento?</strong>',
+            correctAnswer: 'Esquema Básico (RIPE): Rifampicina, Isoniazida, Pirazinamida, Etambutol. Tempo: 6 meses (2 meses fase intensiva + 4 meses fase manutenção com RI).',
+            succinct: 'Esquema básico padronizado.',
+            detailed: 'Fase intensiva (4 drogas) para reduzir carga bacífera. Manutenção (2 drogas) para esterilização.'
+        },
+        {
+            id: 29,
+            type: 'discursive',
+            title: 'Caso Luciana - Contracepção',
+            enunciado: '(Continuação do caso Luciana).<br><br><strong>B) Cite 2 métodos contraceptivos que você poderia indicar para Luciana? Justifique</strong>',
+            correctAnswer: 'DIU de Cobre e Preservativo.',
+            succinct: 'Rifampicina corta efeito hormonal.',
+            detailed: 'A Rifampicina é potente indutor hepático (CYP3A4), acelerando o metabolismo de anticoncepcionais orais e injetáveis.'
+        },
+        {
+            id: 30,
+            type: 'discursive',
+            title: 'Caso Luciana - Contatos',
+            enunciado: '(Continuação do caso Luciana).<br><br><strong>C) Como realizamos o rastreamento dos contatos assintomáticos de Luciana?</strong>',
+            correctAnswer: 'PPD (Prova Tuberculínica) ou IGRA + RX de Tórax.',
+            succinct: 'Para investigar Infecção Latente (ILTB).',
+            detailed: 'Se PPD reator e RX normal (sem doença ativa), indica-se tratamento preventivo da ILTB.'
+        },
+        {
+            id: 31,
+            type: 'discursive',
+            title: 'Caso Sandra - Diagnóstico',
+            enunciado: '<strong>Questão 4:</strong> Sandra, 45 anos... perda de peso... tosse há mais de 20 dias... RX com cavitação.<br><br><strong>A) Qual a principal hipótese diagnóstica e qual exame deverá ser solicitado para confirmação diagnóstica?</strong>',
+            correctAnswer: 'Tuberculose Pulmonar. Teste Rápido Molecular (TRM-TB) no escarro.',
+            succinct: 'Sintomático respiratório clássico.',
+            detailed: 'TRM-TB é o exame de escolha na APS, detectando DNA do bacilo e resistência à Rifampicina.'
+        },
+        {
+            id: 32,
+            type: 'discursive',
+            title: 'Caso Sandra - Tratamento',
+            enunciado: '(Continuação do caso Sandra).<br><br><strong>B) Se confirmada a principal hipótese, qual medicação prescrita como primeira linha e tempo de tratamento realizado?</strong>',
+            correctAnswer: 'Esquema Básico (RIPE) por 6 meses.',
+            succinct: '2 meses RIPE + 4 meses RI.',
+            detailed: ''
+        },
+        {
+            id: 33,
+            type: 'discursive',
+            title: 'Efeitos Colaterais TB',
+            enunciado: 'Vicente está em tratamento para TB.<br><br><strong>A) Qual medicamento do esquema pode causar urina/suor de cor alaranjada? B) E qual medicamento exige suplementação de Piridoxina (Vit B6) se houver risco de neuropatia periférica?</strong>',
+            correctAnswer: 'A) Rifampicina. B) Isoniazida.',
+            succinct: 'Rifampicina tinge fluidos. Isoniazida depleta B6.',
+            detailed: 'A deficiência de B6 causada pela Isoniazida leva a neuropatia periférica.'
+        },
+        {
+            id: 34,
+            type: 'discursive',
+            title: 'TB Latente Criança',
+            enunciado: 'Criança 4 anos, contato de TB. Assintomática, RX normal, PPD 12mm.<br><br><strong>Qual o diagnóstico da criança e qual a conduta terapêutica indicada?</strong>',
+            correctAnswer: 'Infecção Latente (ILTB). Tratar com Rifampicina (4 meses) ou Isoniazida (9 meses).',
+            succinct: 'PPD positivo sem doença ativa em contato próximo = Latência.',
+            detailed: 'Crianças < 5 anos contato de TB têm alto risco de progressão, tratamento da ILTB é prioridade.'
+        },
+        {
+            id: 35,
+            type: 'discursive',
+            title: 'Questão Dengue V/F',
+            enunciado: '<strong>Questão 7:</strong> As arboviroses... Classifique as afirmativas abaixo em verdadeiro ou falso:<br>( ) A Dengue apresenta os sorotipos DEN1-DEN2-DEN3 e DEN4. A contaminação com um sorotipo não adquire imunidade permanente aos demais<br>( ) A sorologia para Dengue, Zika ou Chikungunya poderá ser solicitada a partir do sexto dia de sintomas<br>( ) No manejo da dengue, prova do laço positiva obrigatoriamente inclui o paciente no grupo C ou D de classificação de risco.<br>( ) Os sintomas das arboviroses são muito semelhantes, porém na Zika não é observado quadro de dores articulares.<br>( ) Casos suspeitos de Dengue, Zika ou Chikungunya são doenças de notificação compulsória.',
+            correctAnswer: 'V, V, F, F, V.',
+            succinct: 'Laço positivo é Grupo B. Zika tem artralgia.',
+            detailed: 'A prova do laço positiva indica fragilidade capilar (Grupo B), não choque (Grupo C/D).'
+        },
+        {
+            id: 36,
+            type: 'multiple',
+            title: 'Questão Dengue Objetiva',
+            enunciado: '<strong>Questão 12:</strong> As arboviroses... Assinale a afirmativa correta.',
+            options: [
+                'A) A Dengue apresenta os sorotipos DEN1-DEN2-DEN3 e DEN4. A contaminação com um sorotipo adquire imunidade permanente aos demais',
+                'B) A sorologia para Dengue, Zika ou Chikungunya poderá ser solicitada a partir do 3º dia de sintomas',
+                'C) No manejo da dengue, prova do laço positiva inclui o paciente no grupo B, dependendo dos demais sintomas apresentados.',
+                'D) Os sintomas das arboviroses são muito semelhantes, porém na Zika não é observado quadro de dores articulares.'
+            ],
+            correctAnswer: 2, // C
+            succinct: 'Laço positivo = Grupo B.',
+            detailed: 'Sorologia só após 6º dia.'
+        },
+        {
+            id: 37,
+            type: 'discursive',
+            title: 'Caso Juliana - Dengue',
+            enunciado: 'Você atende Juliana, 25 anos... Dengue sem alarme... Na Prova do Laço, surgiram 30 petéquias no quadrado demarcado.<br><br><strong>A) Qual é o Grupo de estadiamento da Dengue de Juliana (A, B, C ou D)?<br>B) Como a Prova do Laço positiva muda a conduta?</strong>',
+            correctAnswer: 'A) Grupo B. B) Hidratação supervisionada + Hemograma.',
+            succinct: 'Laço positivo exige hemograma para ver hemoconcentração.',
+            detailed: 'Adultos com > 20 petéquias são positivos.'
+        },
+        {
+            id: 38,
+            type: 'multiple',
+            title: 'PNAISC - Mortalidade',
+            enunciado: '<strong>Questão 1:</strong> Sobre a situação de saúde das crianças no Brasil na atualidade é correto afirmar:',
+            options: [
+                'A) Não existem diferenças em relação à morbimortalidade entre as regiões do país, assim como entre as populações de diferentes estratos sócio-econômicos',
+                'B) A mortalidade por causas externas não é significativa',
+                'C) As afecções perinatais são a principal causa de mortalidade em crianças abaixo de 1 ano',
+                'D) Observa-se uma redução do sobrepeso e obesidade entre as crianças'
+            ],
+            correctAnswer: 2, // C
+            succinct: 'Causas perinatais predominam em < 1 ano.',
+            detailed: 'Transição epidemiológica reduziu causas infecciosas.'
+        },
+        {
+            id: 39,
+            type: 'multiple',
+            title: 'PNAISC - Eixos',
+            enunciado: '<strong>Questão 2:</strong> Ao prestar cuidados durante o pré-natal como oferta de testes rápidos para rastreamento de sífilis e HIV na Atenção Primária à Saúde, os profissionais de saúde estão realizando ações previstas em qual eixo da PNAISC?',
+            options: [
+                'A) Eixo estratégico VII Vigilância e Prevenção do Óbito Infantil, Fetal e Materno',
+                'B) Não não nenhum eixo que da Política Nacional de Atenção à Saúde da Criança que trate de cuidados no pré-natal',
+                'C) Eixo estratégico III Promoção e Acompanhamento do Crescimento e Desenvolvimento Integral',
+                'D) Eixo estratégico I Atenção Humanizada e Qualificada à gestação, ao parto, ao nascimento e ao recém nascido'
+            ],
+            correctAnswer: 3, // D
+            succinct: 'Eixo I = Gestação e Parto.',
+            detailed: ''
+        },
+        {
+            id: 40,
+            type: 'multiple',
+            title: 'PNAISC - Desassistência',
+            enunciado: '<strong>Questão 3:</strong> Enzo tem 7 anos... atraso no desenvolvimento... sem consulta desde 9 meses. Considerando a desassistência nesse caso, qual eixo da PNAISC não garantiu proteção a Enzo:',
+            options: [
+                'A) Atenção integral a crianças com agravos prevalentes na infância e com doenças crônicas.',
+                'B) Atenção à saúde da criança com deficiência ou em situações específicas de vulnerabilidade',
+                'C) Promoção e acompanhamento do crescimento e do desenvolvimento integral',
+                'D) Atenção integral à criança em situação de violências, prevenção de acidentes e promoção da cultura da paz.'
+            ],
+            correctAnswer: 2, // C
+            succinct: 'Falha na puericultura (Eixo III).',
+            detailed: ''
+        },
+        {
+            id: 41,
+            type: 'multiple',
+            title: 'Desenvolvimento - Jessica',
+            enunciado: '<strong>Questão 1 (Desenvolvimento):</strong> Jessica tem 9 meses... não senta sem apoio. Nesse caso qual a classificação relativa ao desenvolvimento:',
+            options: [
+                'A) Desenvolvimento adequado',
+                'B) Alerta para o desenvolvimento',
+                'C) Provável atraso no desenvolvimento',
+                'D) Não é possível classificar por não se tratar de marcos do desenvolvimento dessa idade'
+            ],
+            correctAnswer: 2, // C
+            succinct: 'Perda de marco anterior (6m) = Provável Atraso.',
+            detailed: ''
+        },
+        {
+            id: 42,
+            type: 'multiple',
+            title: 'Conduta Jessica',
+            enunciado: '<strong>Questão 2:</strong> Qual a conduta adequada no caso anterior?',
+            options: [
+                'A) Elogiar pais/cuidadores, orientar a seguir a estimulação e acompanhamento de rotina',
+                'B) Acionar a rede de atenção especializada para avaliação do desenvolvimento e seguir acompanhando a criança',
+                'C) Orientar pais/cuidadores sobre estimulação e marcar retorno em 30 dias',
+                'D) Deve-se utilizar a ferramenta com os marcos de desenvolvimento conforme a faixa etária'
+            ],
+            correctAnswer: 1, // B
+            succinct: 'Provável atraso exige encaminhamento.',
+            detailed: ''
+        },
+        {
+            id: 43,
+            type: 'multiple',
+            title: 'Fatores de Risco',
+            enunciado: '<strong>Questão 3:</strong> É correto afirmar sobre esses fatores de risco:',
+            options: [
+                'A) Condições paternas ou dos cuidadores como baixa escolaridade... não são considerados fatores de risco',
+                'B) São considerados fatores ambientais contexto de violência urbana, renda familiar baixa, ruído excessivo',
+                'C) Crianças indesejadas... não são considerados fatores de risco',
+                'D) Fatores pessoais... não são relevantes'
+            ],
+            correctAnswer: 1, // B
+            succinct: 'Vulnerabilidade social.',
+            detailed: ''
+        },
+        {
+            id: 44,
+            type: 'multiple',
+            title: 'Gráfico Kaylla',
+            enunciado: '<strong>Questão 4:</strong> Kaylla, 6 meses... (Curva desceu 2 canais Z). Assinale a alternativa correta.',
+            options: [
+                'A) A curva formada no gráfico está adequada, sem necessidade de intervenção',
+                'B) A curva formada no gráfico apresenta um sinal de alarme que deve ser investigado',
+                'C) A curva formada no gráfico apresenta um sinal de alarme e deve-se encaminhar Kaylla para um serviço especializado',
+                'D) A curva formada no gráfico está diferente do esperado, porém não configura-se como sinal de alarme...'
+            ],
+            correctAnswer: 1, // B
+            succinct: 'Desaceleração é sinal de alarme.',
+            detailed: ''
+        },
+        {
+            id: 45,
+            type: 'multiple',
+            title: 'Triagem Neonatal - Prazos',
+            enunciado: '<strong>Questão 1 (RN):</strong> Sobre os testes de rastreio neonatal é correto afirmar:',
+            options: [
+                'A) O teste do pezinho deve ser realizado na maternidade antes da alta...',
+                'B) Para realização do teste da orelhinha... o exame deve ser realizado após o primeiro mês de vida',
+                'C) O teste do coraçãozinho é uma triagem para cardiopatia congênita crítica e deve ser realizado entre 24 e 48 horas de vida, antes da alta hospitalar.',
+                'D) O teste do olhinho... deve ser realizado somente na maternidade.'
+            ],
+            correctAnswer: 2, // C
+            succinct: 'Coraçãozinho 24-48h.',
+            detailed: ''
+        }
+    ];
+    const questionsPart3 = [
+        {
+            id: 46,
+            type: 'multiple',
+            title: 'Aleitamento - Fatores',
+            enunciado: '<strong>Questão 2:</strong> As evidências dos benefícios do aleitamento materno... assinale a alternativa correta.',
+            options: [
+                'A) Mamilos planos impedem a amamentação e deve ser introduzido leite artificial para o bebê',
+                'B) O leite anterior é composto predominantemente por lipídios...',
+                'C) Lábios do bebê virados para dentro... é sinal de boa pega.',
+                'D) Alguns fatores apresentam impacto na prevalência de aleitamento materno como a escolaridade da mãe, presença de rede de apoio, alta hospitalar em aleitamento materno'
+            ],
+            correctAnswer: 3, // D
+            succinct: 'Determinantes sociais.',
+            detailed: ''
+        },
+        {
+            id: 47,
+            type: 'multiple',
+            title: 'RN de Risco',
+            enunciado: '<strong>Questão 3:</strong> Arthur... peso 2.390g... mãe adolescente... Assinale a alternativa correta',
+            options: [
+                'A) Arthur apresenta situação de risco... urgência.',
+                'B) Arthur apresenta situações de risco: baixo peso ao nascer, aleitamento artificial e ser filho de mãe adolescente, assim necessita de um segmento diferenciado pela equipe de saúde da família',
+                'C) Arthur apresenta situação de risco... e não deve ser acompanhado...',
+                'D) Arthur é considerado criança de risco habitual...'
+            ],
+            correctAnswer: 1, // B
+            succinct: 'Acúmulo de riscos.',
+            detailed: ''
+        },
+        {
+            id: 48,
+            type: 'multiple',
+            title: 'Aconselhamento RN',
+            enunciado: '<strong>Questão 4:</strong> Com relação às orientações e aconselhamentos durante a consulta do recém nascido é correto afirmar:',
+            options: [
+                'A) O co-leito é recomendado para todas as famílias...',
+                'B) Cobertores devem ser utilizados em dias frios...',
+                'C) Tabagismo entre familiares do recém nascido aumenta o risco de morte súbita',
+                'D) A posição recomendada... é de barriga para baixo'
+            ],
+            correctAnswer: 2, // C
+            succinct: 'Fumo passivo = Risco SIDS.',
+            detailed: ''
+        },
+        {
+            id: 49,
+            type: 'multiple',
+            title: 'Contraindicações AM',
+            enunciado: '<strong>Questão 5:</strong> Em relação às contraindicações de aleitamento materno, assinale a alternativa correta.',
+            options: [
+                'A) Estado febril da mãe',
+                'B) Mastite',
+                'C) Herpes labial',
+                'D) HTLV 1 e 2'
+            ],
+            correctAnswer: 3, // D
+            succinct: 'HTLV transmite pelo leite.',
+            detailed: ''
+        },
+        {
+            id: 50,
+            type: 'multiple',
+            title: 'Eritema Tóxico',
+            enunciado: '<strong>Questão 6:</strong> Joana... manchas vermelhas... médico diz eritema tóxico. Qual a conduta nesse caso?',
+            options: [
+                'A) Encaminhar para emergência...',
+                'B) Acalmar a mãe e orientar que as lesões desaparecem espontaneamente sem qualquer tratamento',
+                'C) Prescrever anti alérgico...',
+                'D) Acalmar a mãe e orientar banhos frios...'
+            ],
+            correctAnswer: 1, // B
+            succinct: 'Benigno e autolimitado.',
+            detailed: ''
+        },
+        {
+            id: 51,
+            type: 'multiple',
+            title: 'Postura RN',
+            enunciado: '<strong>Questão 7:</strong> Sobre a primeira avaliação do Recém nascido na APS é correto afirmar:',
+            options: [
+                'A) Considera-se uma postura normal quando o recém nascido apresenta as extremidades fletidas, mãos fechadas e o rosto, geralmente, dirigido a um dos lados',
+                'B) A presença de estrabismo é um sinal de alarme...',
+                'C) Deve-se orientar a movimentação do pescoço... para evitar torcicolo...',
+                'D) O rastreio de displasia... deve ser realizada em ambos os membros ao mesmo tempo...'
+            ],
+            correctAnswer: 0, // A
+            succinct: 'Tônus flexor é normal.',
+            detailed: ''
+        },
+        {
+            id: 52,
+            type: 'multiple',
+            title: 'Reflexos Primitivos',
+            enunciado: '<strong>Questão 8:</strong> A respeito dos reflexos primitivos, é correto afirmar:',
+            options: [
+                'A) É esperado que... persistam após os 5 primeiros anos...',
+                'B) A presença do reflexo cutâneo plantar é considerada patológica a partir dos 18 meses...',
+                'C) A ausência dos reflexos primitivos significa integridade...',
+                'D) Em crianças saudáveis, o reflexo de moro apresenta-se de forma simétrica.'
+            ],
+            correctAnswer: 3, // D
+            succinct: 'Assimetria de Moro sugere lesão.',
+            detailed: ''
+        },
+        {
+            id: 53,
+            type: 'multiple',
+            title: 'Aleitamento EXCETO',
+            enunciado: '<strong>Questão 9:</strong> Sobre o aleitamento materno é correto afirmar, EXCETO:',
+            options: [
+                'A) Reduz o risco de morte súbita do lactente.',
+                'B) Diminui a incidência de hiperbilirrubinemia.',
+                'C) Deve ser recomendado desde o nascimento até a criança completar 2 anos, quando deve ser interrompido por não apresentar mais benefícios.',
+                'D) Está contra indicado em mães que vivem com HIV ou HTLV 1 e 2.'
+            ],
+            correctAnswer: 2, // C
+            succinct: 'AM tem benefício após 2 anos.',
+            detailed: ''
+        },
+        {
+            id: 54,
+            type: 'multiple',
+            title: 'Diarreia Pedro',
+            enunciado: '<strong>Questão 1:</strong> Pedro... irritado, referindo sede... Olhos fundos, lágrimas ausentes... retorno lento da prega... Diante do caso, assinale a alternativa correta.',
+            options: [
+                'A) Pedro não apresenta sinais de desidratação...',
+                'B) Pedro apresenta disenteria...',
+                'C) Pedro deve permanecer na unidade de saúde para realizar a reidratação oral até que desapareçam os sinais de desidratação.',
+                'D) Pedro apresenta sinais de desidratação grave...'
+            ],
+            correctAnswer: 2, // C
+            succinct: 'Desidratação (Plano B). TRO na UBS.',
+            detailed: ''
+        },
+        {
+            id: 55,
+            type: 'multiple',
+            title: 'Respiratório Pietra',
+            enunciado: '<strong>Questão 2:</strong> Pietra 4 meses... taquipneia, sibilância... Assinale a alternativa correta.',
+            options: [
+                'A) A bronquiolite é uma doença viral que cursa com sibilância, febre e dispnéia, sendo uma hipótese diagnóstica possível para o quadro de Pietra.',
+                'B) A conduta indicada... é prescrição de azitromicina...',
+                'C) A lavagem nasal com soro fisiológico não é indicada...',
+                'D) A etiologia mais provável... é bacteriana.'
+            ],
+            correctAnswer: 0, // A
+            succinct: 'Bronquiolite viral aguda.',
+            detailed: ''
+        },
+        {
+            id: 56,
+            type: 'multiple',
+            title: 'Taquipneia',
+            enunciado: '<strong>Questão 3:</strong> Assinale a alternativa que apresenta o valor da frequência respiratória alterada para cada faixa etária...',
+            options: [
+                'A) Menor que 4 meses: >= 60...',
+                'B) Menor que 2 meses: >= 50...',
+                'C) Menor que 3 meses: >= 60...',
+                'D) Menor que 2 meses: >= 60 irpm / Entre 2 a 11 meses: >= 50 irpm / Entre 1 a 5 anos: >= 40 irpm'
+            ],
+            correctAnswer: 3, // D
+            succinct: 'Critérios OMS.',
+            detailed: ''
+        },
+        {
+            id: 57,
+            type: 'multiple',
+            title: 'Otite Isis',
+            enunciado: '<strong>Questão 4:</strong> Isis... dor no ouvido... abaulamento... otorreia purulenta... Qual a principal hipótese diagnóstica e a conduta terapêutica?',
+            options: [
+                'A) Otalgia inespecífica...',
+                'B) Otite média aguda sem complicações, sendo recomendada prescrição de antibiótico e analgésicos via oral.',
+                'C) Mastoidite...',
+                'D) Cerume impactado...'
+            ],
+            correctAnswer: 1, // B
+            succinct: 'OMA purulenta exige antibiótico.',
+            detailed: ''
+        },
+        {
+            id: 58,
+            type: 'multiple',
+            title: 'Bronquiolite Sinais',
+            enunciado: '<strong>Questão 10:</strong> Lactente 4 meses... respirando rápido... Sobre o quadro respiratório descrito, é correto afirmar:',
+            options: [
+                'A) A frequência respiratória... alterada a partir de 30...',
+                'B) A etiologia... é bacteriana',
+                'C) Na bronquiolite, não é indicada a lavagem...',
+                'D) A bronquiolite é uma doença bacteriana...',
+                'E) A presença de batimento de asa do nariz, tiragem intercostal e taquipneia são considerados sinais de alarme no lactente'
+            ],
+            correctAnswer: 4, // E
+            succinct: 'Sinais de esforço respiratório grave.',
+            detailed: ''
+        },
+        {
+            id: 59,
+            type: 'discursive',
+            title: 'Puericultura 6 Meses',
+            enunciado: 'Você atende Theo, de 6 meses, na consulta de rotina. <strong>Cite dois marcos do desenvolvimento motor ou social esperados obrigatoriamente para essa idade. Se ele ainda não sustentasse a cabeça (controle cervical), qual seria a classificação do desenvolvimento?</strong>',
+            correctAnswer: 'Rolar e Sentar com apoio. Classificação: Provável Atraso.',
+            succinct: 'Perda de marco de 3 meses (sustentar cabeça) é grave.',
+            detailed: ''
+        },
+        {
+            id: 60,
+            type: 'discursive',
+            title: 'Vacinação 4 Meses',
+            enunciado: 'Luizinho tem 4 meses e veio para a consulta de rotina. <strong>A) Quais são as 4 vacinas injetáveis e a 1 vacina oral que ele deve receber hoje (calendário do SUS)?</strong>',
+            correctAnswer: 'Injetáveis: Pentavalente, VIP, Pneumo 10V. Oral: Rotavírus.',
+            succinct: '2ª dose esquema básico.',
+            detailed: ''
+        },
+        {
+            id: 61,
+            type: 'discursive',
+            title: 'Vacinação EHH',
+            enunciado: '(Continuação). <strong>C) A mãe relata que após a vacina de 2 meses, Luizinho teve febre alta e choro persistente, mas sem convulsão (Episódio Hipotônico-Hiporresponsivo). Isso contraindica a dose de hoje da Pentavalente?</strong>',
+            correctAnswer: 'Sim. Substituir por DTPa (Acelular).',
+            succinct: 'EHH contraindica pertussis celular.',
+            detailed: ''
+        },
+        {
+            id: 62,
+            type: 'multiple',
+            title: 'PEP HIV',
+            enunciado: '<strong>Questão 6:</strong> Funcionária da limpeza... acidenta-se com agulha... A profilaxia pós-exposição de HIV nesta paciente:',
+            options: [
+                'A) Deve ser iniciada imediatamente e mantida por um mês.',
+                'B) Deve ser considerada após resultado de sorologia negativa.',
+                'C) Deve ser iniciada imediatamente e reavaliada após resultado de sorologia.',
+                'D) Não é recomendada.'
+            ],
+            correctAnswer: 0, // A
+            succinct: 'Urgência médica (ideal < 2h).',
+            detailed: ''
+        },
+        {
+            id: 63,
+            type: 'multiple',
+            title: 'Risco Suicídio',
+            enunciado: '<strong>Questão 7:</strong> Sobre o Risco de Suicídio... é correto afirmar:',
+            options: [
+                'A) O risco é alto quando a pessoa tem pensamentos...',
+                'B) O risco é baixo quando a pessoa teve pensamentos...',
+                'C) O risco é baixo quando a pessoa não teve pensamentos...',
+                'D) O risco é médio quando a pessoa teve pensamentos, mas não fez nenhum plano.'
+            ],
+            correctAnswer: 3, // D
+            succinct: 'Ideação sem plano = Risco Médio.',
+            detailed: ''
+        },
+        {
+            id: 64,
+            type: 'multiple',
+            title: 'Prevenção Quaternária',
+            enunciado: '<strong>Questão 8:</strong> A prevenção quaternária... uma ação fundamental é:',
+            options: [
+                'A) A intervenção médica continuada',
+                'B) O uso da medicina baseada em evidências',
+                'C) A realização de exames em assintomáticos',
+                'D) O rastreamento de doenças por testes genéticos'
+            ],
+            correctAnswer: 1, // B
+            succinct: 'MBE evita iatrogenias.',
+            detailed: ''
+        },
+        {
+            id: 65,
+            type: 'multiple',
+            title: 'Mão-Pé-Boca',
+            enunciado: '<strong>Questão 9:</strong> Bernardo, 18 meses... úlceras orais, vesículas... qual o agente causador?',
+            options: [
+                'A) Vírus Varicela-zoster',
+                'B) Coxsackie',
+                'C) Parvovírus B19',
+                'D) Herpes Vírus'
+            ],
+            correctAnswer: 1, // B
+            succinct: 'Síndrome Mão-Pé-Boca.',
+            detailed: ''
+        },
+        {
+            id: 66,
+            type: 'multiple',
+            title: 'Longitudinalidade',
+            enunciado: '<strong>Questão 9:</strong> "É importante o acompanhamento dos pacientes ao longo do tempo..." O atributo da APS é:',
+            options: [
+                'A) coordenação do cuidado',
+                'B) longitudinalidade',
+                'C) orientação familiar',
+                'D) integralidade',
+                'E) acesso'
+            ],
+            correctAnswer: 1, // B
+            succinct: 'Acompanhamento temporal e vínculo.',
+            detailed: ''
+        },
+        {
+            id: 67,
+            type: 'multiple',
+            title: 'Método Clínico',
+            enunciado: 'O cuidado deve ser moldado a partir da narrativa da paciente... O Método Clínico da Atenção Primária que propõe essa abordagem é:',
+            options: [
+                'A) Método Clínico Baseado em Evidências',
+                'B) Método Clínico Centrado na Pessoa (MCCP)',
+                'C) Método Clínico Centrado na Doença',
+                'D) Método Clínico Orientado à Comunidade'
+            ],
+            correctAnswer: 1, // B
+            succinct: 'Foco na pessoa, não na doença.',
+            detailed: ''
+        },
+        {
+            id: 68,
+            type: 'multiple',
+            title: 'Genograma',
+            enunciado: 'Ao desenhar o genograma... relação "muito grudada, excessivamente próxima". Qual símbolo?',
+            options: [
+                'A) Duas linhas paralelas.',
+                'B) Três linhas paralelas.',
+                'C) Uma linha em ziguezague.',
+                'D) Uma linha pontilhada.'
+            ],
+            correctAnswer: 1, // B
+            succinct: 'Três linhas = Relação fusional.',
+            detailed: ''
+        },
+        {
+            id: 69,
+            type: 'discursive',
+            title: 'Depressão Sônia',
+            enunciado: 'Paciente relata que "não aguenta mais viver"... mas afirma categoricamente que não fará isso por causa de sua religião e de seus netos. <strong>Como você classifica esse risco (Leve, Médio ou Alto) e onde deve ser feito o acompanhamento inicial (Ambulatorial/UBS ou Internação imediata)?</strong>',
+            correctAnswer: 'Risco Médio. Ambulatorial.',
+            succinct: 'Fatores de proteção fortes reduzem risco imediato.',
+            detailed: ''
+        },
+        {
+            id: 70,
+            type: 'discursive',
+            title: 'Sífilis Gestante Controle',
+            enunciado: 'Gestante, 24 semanas, tratada... VDRL caiu de 1:32 para 1:8. <strong>Qual a interpretação desse resultado (sucesso, falha ou reinfecção) e qual a conduta?</strong>',
+            correctAnswer: 'Sucesso Terapêutico. Conduta: VDRL Mensal.',
+            succinct: 'Queda de 2 diluições.',
+            detailed: ''
+        }
+    ];
+    const questionsPart4 = [
+        {
+            id: 71,
+            type: 'discursive',
+            title: 'HAS Mercedes',
+            enunciado: 'Dona Mercedes, 68 anos, negra, diabética... PA 164 x 102 mmHg.<br><br><strong>A) Qual o estágio da hipertensão?<br>B) Deve-se iniciar com Monoterapia ou Terapia Combinada?<br>C) Qual a classe de anti-hipertensivo é a primeira escolha para ela?</strong>',
+            correctAnswer: 'A) Estágio 2. B) Combinada. C) IECA/BRA + Tiazídico/BCC.',
+            succinct: 'DM exige nefroproteção (IECA/BRA). Negra exige diurético/BCC.',
+            detailed: 'A combinação atende à proteção renal e à melhor resposta pressórica da raça negra.'
+        },
+        {
+            id: 72,
+            type: 'discursive',
+            title: 'Rastreio Cida',
+            enunciado: 'Dona Cida, 67 anos...<br><br><strong>A) Ela deve realizar Mamografia de rastreio hoje? Por que?<br>B) Ela deve realizar Preventivo de rastreio hoje? Por que?</strong>',
+            correctAnswer: 'A) Sim (faixa 50-69). B) Não (faixa até 64).',
+            succinct: 'Protocolo MS: Mama até 69, Colo até 64.',
+            detailed: 'Mulheres > 64 anos com exames anteriores normais podem ser dispensadas do preventivo.'
+        },
+        {
+            id: 73,
+            type: 'discursive',
+            title: 'Caso Roberto e Viviane (Geriatria)',
+            enunciado: '<strong>Questão 11:</strong><br>a. Viviane não se queixa da audição.<br>b. Roberto conta que Viviane tem dificuldades com dinheiro.<br>c. Roberto triste/desanimado.<br>d. Viviane sofreu uma queda em tapete.<br><br><strong>Quais as condutas imediatas para cada item?</strong>',
+            correctAnswer: 'A) Teste do Sussurro. B) MEEM. C) Investigar causas orgânicas/álcool. D) Timed Up and Go.',
+            succinct: 'Rastreio de presbiacusia, demência, depressão secundária e risco de quedas.',
+            detailed: 'Abordagem dos "Gigantes da Geriatria" na atenção primária.'
+        },
+        {
+            id: 74,
+            type: 'multiple',
+            title: 'Luto - Mariane',
+            enunciado: '<strong>Questão 12:</strong> Dra. Marcia... laudo de metástase... Quais as possíveis reações da paciente frente ao resultado... considerando os estágios de enfrentamento da morte?',
+            options: [
+                'A) A pessoa doente pode enfrentar os seguintes estágios do luto: negação inicial, raiva, negociação pela cura, depressão e finalmente aceitação. Nem sempre todos passam por essas fases, nem nessa mesma sequência.',
+                'B) Entre os estágios previstos a paciente passa na seguinte ordem: raiva, barganha...',
+                'C) Entre os estágios de luto espera-se que a paciente passe pela raiva, aceitação...',
+                'D) Sempre presentes, mas nem sempre nessa mesma sequência.'
+            ],
+            correctAnswer: 0, // A
+            succinct: 'Modelo Kübler-Ross: Fases não lineares.',
+            detailed: 'O luto é um processo dinâmico, não uma sequência rígida.'
+        },
+        {
+            id: 75,
+            type: 'multiple',
+            title: 'Envelhecimento BR',
+            enunciado: '<strong>Questão 13:</strong> Sobre do processo de envelhecimento populacional observado no Brasil nas últimas décadas, assinale a opção correta.',
+            options: [
+                'A) A velocidade do envelhecimento populacional no Brasil é mais lenta...',
+                'B) Apesar do aumento dos idosos, os muito idosos... não aumentaram.',
+                'C) O avanço da tecnologia médica não teve influência...',
+                'D) A predominância feminina entre os idosos é um fenômeno urbano.'
+            ],
+            correctAnswer: 3, // D
+            succinct: 'Feminização da velhice.',
+            detailed: 'Mulheres vivem mais, mas frequentemente com mais morbidades e viuvez.'
+        },
+        {
+            id: 76,
+            type: 'discursive',
+            title: 'Linha Cuidado Idoso',
+            enunciado: '<strong>Questão 17:</strong> V ou F sobre PNSPI...<br>( ) Linha de cuidado...<br>( ) Cadastramento prescindível...<br>( ) Avaliação multidimensional não identifica...<br>( ) Articulação SUAS...<br>( ) Caderneta favorece comunicação...',
+            correctAnswer: 'V, F, F, V, V.',
+            succinct: 'Avaliação multidimensional é imprescindível.',
+            detailed: 'A avaliação global é o pilar da geriatria na APS.'
+        },
+        {
+            id: 77,
+            type: 'multiple',
+            title: 'Saúde Cuidador',
+            enunciado: '<strong>Questão 18:</strong> Sobre a saúde do cuidador é incorreto afirmar que:',
+            options: [
+                'A) A Escala de Zarit avalia o estresse do cuidador, sendo que a maior sobrecarga é demonstrada pelos menores escores.',
+                'B) Cuidadores informais qualificados... menor risco...',
+                'C) Sentir-se cansado... sinais de adoecimento...',
+                'D) Menor escolaridade... fatores de risco...'
+            ],
+            correctAnswer: 0, // A
+            succinct: 'Incorreta: Maior escore = Maior sobrecarga.',
+            detailed: 'A Escala de Zarit é diretamente proporcional ao estresse.'
+        },
+        {
+            id: 78,
+            type: 'multiple',
+            title: 'HAS Crise Vilma',
+            enunciado: '<strong>1)</strong> Vilma... cefaleia... UPA PA 180x90... baixou com analgésico... Dia seguinte 130x80. Correta:',
+            options: [
+                'A) O tratamento com duas drogas anti-hipertensivas deveria ter sido iniciado na UPA...',
+                'B) A redução da pressão arterial no pronto-socorro... é a melhor conduta...',
+                'C) O médico de família pode descartar hipertensão arterial...',
+                'D) A monitorização da pressão arterial em outras ocasiões é indispensável para a definição do diagnóstico de hipertensão arterial neste caso.'
+            ],
+            correctAnswer: 3, // D
+            succinct: 'Pseudocrise álgica. Precisa de MRPA/MAPA.',
+            detailed: 'Elevação tensional reativa à dor não confirma HAS crônica.'
+        },
+        {
+            id: 79,
+            type: 'discursive',
+            title: 'Pré-Natal Rosa V/F',
+            enunciado: '<strong>2)</strong> Rosa... Vômitos... Glicose 98... Bactérias ++. V ou F?',
+            correctAnswer: 'V, V, V, V, V, F, F, F, F.',
+            succinct: 'Glicose >= 92 é DMG. Bacteriúria exige cultura > 100k.',
+            detailed: 'A presença de bactérias no EAS sem cultura não confirma infecção.'
+        },
+        {
+            id: 80,
+            type: 'discursive',
+            title: 'Pré-Natal Josiane V/F',
+            enunciado: '<strong>3)</strong> Josiane 37sem... Tampão mucoso. V ou F?',
+            correctAnswer: 'V, V, V, F.',
+            succinct: 'Saída de tampão não é urgência médica.',
+            detailed: 'Indica preparo do colo, mas o parto pode demorar dias.'
+        },
+        {
+            id: 81,
+            type: 'discursive',
+            title: 'Caso Reginaldo - TB/IST',
+            enunciado: '<strong>1)</strong> Reginaldo... rua... tosse com sangue... Sífilis/HIV reagentes. <strong>A) Sinais TB? B) Sinais ICC? C) Conduta Sífilis? D) HIV?</strong>',
+            correctAnswer: 'A) Tosse, hemoptise. B) Ortopneia, B3, edema. C) Tratar imediato. D) Iniciar TARV, notificar.',
+            succinct: 'População vulnerável: tratar imediatamente.',
+            detailed: 'Coinfecção TB/HIV/Sífilis em população de rua exige abordagem sindrômica agressiva.'
+        },
+        {
+            id: 82,
+            type: 'discursive',
+            title: 'Saúde Mental Vilson',
+            enunciado: '<strong>1)</strong> Vilson... isolado... conversa sozinho. V ou F?',
+            correctAnswer: 'V, V, V, V, F.',
+            succinct: 'Esquizofrenia. Cidadania deve ser mantida.',
+            detailed: 'A última é falsa pois a doença não retira a cidadania plena.'
+        },
+        {
+            id: 83,
+            type: 'multiple',
+            title: 'Luto Soraia',
+            enunciado: '<strong>2)</strong> Soraia... tristeza após morte marido... melhora no trabalho. Correta:',
+            options: [
+                'A) O tratamento farmacológico... é uma conduta com benefício comprovado.',
+                'B) As dores generalizadas... configuram fibromialgia...',
+                'C) No caso descrito, é fundamental recuperar a importância da relação médico-paciente... mas que não tem efeito terapêutico...',
+                'D) O estado de luto compõe uma espécie de rito de passagem natural dos seres humanos após uma importante perda. Resolve espontaneamente e dispensa tratamento farmacológico na maioria dos casos.',
+                'E) O luto é considerado "complicado"... independente do seu tempo...'
+            ],
+            correctAnswer: 3, // D
+            succinct: 'Luto normal não se medica.',
+            detailed: 'Sintomas flutuantes e melhora com distração indicam luto não complicado.'
+        }
+    ];
+
+    // CONCATENAÇÃO DE TODAS AS PARTES (1, 2, 3 e 4)
+    const allQuestions = [
+        ...questionsPart1, 
+        ...questionsPart2, 
+        ...questionsPart3,
+        ...questionsPart4
+    ];
+
+    let currentQuestion = 0;
+    const container = document.getElementById('quiz-container');
+    const progress = document.getElementById('progress');
+    const progressText = document.getElementById('progress-text');
+
+    function renderQuestion() {
+        const q = allQuestions[currentQuestion];
+        progress.style.width = `${((currentQuestion + 1) / allQuestions.length) * 100}%`;
+        progressText.textContent = `Questão ${currentQuestion + 1} de ${allQuestions.length}`;
+        
+        let html = `
+            <div class="question-box active">
+                <h3>${q.title}</h3>
+                <div class="enunciado">${q.enunciado}</div>
+        `;
+
+        if (q.type === 'multiple') {
+            html += '<div class="options">';
+            q.options.forEach((opt, index) => {
+                html += `
+                    <label>
+                        <input type="radio" name="q${q.id}" value="${index}">
+                        <span>${opt}</span>
+                    </label>
+                `;
+            });
+            html += '</div>';
+        } else {
+            html += `<textarea id="text-q${q.id}" placeholder="Digite sua resposta aqui..."></textarea>`;
+        }
+
+        html += `<button class="btn-action" onclick="checkAnswer(${q.id})">Responder</button>`;
+        
+        html += `
+            <div id="feedback-${q.id}" class="feedback">
+                <div class="result-text answer-header"></div>
+                <div class="correct-answer" style="margin-bottom:15px; color:#2c3e50;"><strong>Gabarito:</strong> <br>${q.correctAnswer}</div>
+                
+                <div class="explanation-block">
+                    <div class="tag tag-succinct">Explicação Rápida</div>
+                    <p>${q.succinct}</p>
+                </div>
+
+                <div class="explanation-block" style="margin-top:10px;">
+                    <div class="tag tag-theory">Aprofundamento Teórico</div>
+                    <p>${q.detailed}</p>
+                </div>
+
+                <div class="nav-buttons">
+                    ${currentQuestion > 0 ? `<button class="btn-nav btn-prev" onclick="prevQuestion()">Anterior</button>` : ''}
+                    ${currentQuestion < allQuestions.length - 1 ? `<button class="btn-nav btn-next" onclick="nextQuestion()">Próxima Questão</button>` : '<button class="btn-nav btn-next" onclick="alert(\'Parabéns! Você finalizou todo o simulado!\')">Finalizar</button>'}
+                </div>
+            </div>
+        </div>`;
+
+        container.innerHTML = html;
+    }
+
+    window.checkAnswer = function(id) {
+        const q = allQuestions[currentQuestion];
+        const feedback = document.getElementById(`feedback-${id}`);
+        const resultText = feedback.querySelector('.result-text');
+        const button = document.querySelector('.btn-action');
+        const labels = document.querySelectorAll('.options label');
+        
+        if (q.type === 'multiple') {
+            const inputs = document.querySelectorAll(`input[name="q${id}"]`);
+            let selectedValue = null;
+            inputs.forEach((input, index) => {
+                if(input.checked) selectedValue = parseInt(input.value);
+                input.disabled = true;
+            });
+
+            if (selectedValue !== null) {
+                if (selectedValue === q.correctAnswer) {
+                    feedback.className = 'feedback show correct-style';
+                    resultText.innerHTML = '✅ <strong>Resposta Correta!</strong>';
+                    labels[selectedValue].classList.add('selected');
+                } else {
+                    feedback.className = 'feedback show wrong-style';
+                    resultText.innerHTML = '❌ <strong>Incorreto.</strong>';
+                    labels[selectedValue].style.borderColor = '#e74c3c';
+                    if(labels[q.correctAnswer]) {
+                        labels[q.correctAnswer].style.backgroundColor = '#d4edda';
+                        labels[q.correctAnswer].style.borderColor = '#28a745';
+                    }
+                }
+            } else {
+                alert("Por favor, selecione uma opção.");
+                return;
+            }
+        } else {
+            const text = document.getElementById(`text-q${id}`);
+            text.disabled = true;
+            feedback.className = 'feedback show info-style';
+            resultText.innerHTML = '📝 <strong>Confira sua resposta:</strong>';
+        }
+
+        feedback.style.display = 'block';
+        button.style.display = 'none';
+    };
+
+    window.nextQuestion = function() {
+        if (currentQuestion < allQuestions.length - 1) {
+            currentQuestion++;
+            renderQuestion();
+            window.scrollTo(0, 0);
+        }
+    };
+
+    window.prevQuestion = function() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            renderQuestion();
+            window.scrollTo(0, 0);
+        }
+    };
+
+    // Inicialização
+    renderQuestion();
+</script>
+
+</body>
+</html>
